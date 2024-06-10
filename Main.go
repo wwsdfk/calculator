@@ -52,6 +52,9 @@ func calculate(input string) (string, error) {
 
 	if isRoman {
 		a, b := romanToInt[num1], romanToInt[num2]
+		if !isValidNumber(a) || !isValidNumber(b) {
+			return "", errors.New("числа должны быть от I до X включительно")
+		}
 		result, err := performOperation(a, b, operator)
 		if err != nil {
 			return "", err
@@ -65,6 +68,9 @@ func calculate(input string) (string, error) {
 	if isArabic {
 		a, _ := strconv.Atoi(num1)
 		b, _ := strconv.Atoi(num2)
+		if !isValidNumber(a) || !isValidNumber(b) {
+			return "", errors.New("числа должны быть от 1 до 10 включительно")
+		}
 		result, err := performOperation(a, b, operator)
 		if err != nil {
 			return "", err
@@ -101,4 +107,8 @@ func isRoman(input string) bool {
 func isNumeric(input string) bool {
 	_, err := strconv.Atoi(input)
 	return err == nil
+}
+
+func isValidNumber(n int) bool {
+	return n >= 1 && n <= 10
 }
