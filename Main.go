@@ -43,14 +43,12 @@ func calculate(input string) (string, error) {
 	operator := parts[1]
 	num2 := parts[2]
 
-	isRoman := isRoman(num1) && isRoman(num2)
-	isArabic := isNumeric(num1) && isNumeric(num2)
+	isRoman1 := isRoman(num1)
+	isRoman2 := isRoman(num2)
+	isArabic1 := isNumeric(num1)
+	isArabic2 := isNumeric(num2)
 
-	if !isRoman && !isArabic {
-		return "", errors.New("числа должны быть либо оба арабскими, либо оба римскими")
-	}
-
-	if isRoman {
+	if isRoman1 && isRoman2 {
 		a, b := romanToInt[num1], romanToInt[num2]
 		if !isValidNumber(a) || !isValidNumber(b) {
 			return "", errors.New("числа должны быть от I до X включительно")
@@ -63,9 +61,7 @@ func calculate(input string) (string, error) {
 			return "", errors.New("результат меньше единицы недопустим для римских чисел")
 		}
 		return intToRoman[result], nil
-	}
-
-	if isArabic {
+	} else if isArabic1 && isArabic2 {
 		a, _ := strconv.Atoi(num1)
 		b, _ := strconv.Atoi(num2)
 		if !isValidNumber(a) || !isValidNumber(b) {
@@ -76,9 +72,9 @@ func calculate(input string) (string, error) {
 			return "", err
 		}
 		return strconv.Itoa(result), nil
+	} else {
+		return "", errors.New("числа должны быть либо оба арабскими, либо оба римскими")
 	}
-
-	return "", errors.New("неизвестная ошибка")
 }
 
 func performOperation(a, b int, operator string) (int, error) {
