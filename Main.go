@@ -60,7 +60,7 @@ func calculate(input string) (string, error) {
 		if result < 1 {
 			return "", errors.New("результат меньше единицы недопустим для римских чисел")
 		}
-		return intToRoman[result], nil
+		return intToRomanNumber(result), nil
 	} else if isArabic1 && isArabic2 {
 		a, _ := strconv.Atoi(num1)
 		b, _ := strconv.Atoi(num2)
@@ -107,4 +107,20 @@ func isNumeric(input string) bool {
 
 func isValidNumber(n int) bool {
 	return n >= 1 && n <= 10
+}
+
+func intToRomanNumber(num int) string {
+	val := []int{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}
+	syb := []string{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"}
+
+	roman := ""
+	i := 0
+	for num > 0 {
+		for val[i] <= num {
+			roman += syb[i]
+			num -= val[i]
+		}
+		i++
+	}
+	return roman
 }
