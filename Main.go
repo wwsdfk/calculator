@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -20,23 +19,24 @@ var intToRoman = []string{
 }
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Ошибка:", r)
+		}
+	}()
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Введите выражение (например, 3 + 5 или II * III):")
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
 
-	result, err := calculate(input)
-	if err != nil {
-		fmt.Println("Ошибка:", err)
-	} else {
-		fmt.Println("Результат:", result)
-	}
+	result := calculate(input)
+	fmt.Println("Результат:", result)
 }
 
-func calculate(input string) (string, error) {
+func calculate(input string) string {
 	parts := strings.Split(input, " ")
 	if len(parts) != 3 {
-		return "", errors.New("некорректный формат ввода")
+		panic("некорректный формат ввода")
 	}
 
 	num1 := parts[0]
@@ -51,29 +51,29 @@ func calculate(input string) (string, error) {
 	if isRoman1 && isRoman2 {
 		a, b := romanToInt[num1], romanToInt[num2]
 		if !isValidNumber(a) || !isValidNumber(b) {
-			return "", errors.New("числа должны быть от I до X включительно")
+			panic("числа должны быть от I до X включительно")
 		}
 		result, err := performOperation(a, b, operator)
 		if err != nil {
-			return "", err
+			panic(err.Error())
 		}
 		if result < 1 {
-			return "", errors.New("результат меньше единицы недопустим для римских чисел")
+			panic("результат меньше единицы недопустим для римских чисел")
 		}
-		return intToRomanNumber(result), nil
+		return intToRomanNumber(result)
 	} else if isArabic1 && isArabic2 {
 		a, _ := strconv.Atoi(num1)
 		b, _ := strconv.Atoi(num2)
 		if !isValidNumber(a) || !isValidNumber(b) {
-			return "", errors.New("числа должны быть от 1 до 10 включительно")
+			panic("числа должны быть от 1 до 10 включительно")
 		}
 		result, err := performOperation(a, b, operator)
 		if err != nil {
-			return "", err
+			panic(err.Error())
 		}
-		return strconv.Itoa(result), nil
+		return strconv.Itoa(result)
 	} else {
-		return "", errors.New("числа должны быть либо оба арабскими, либо оба римскими")
+		panic("числа должны быть либо оба арабскими, либо оба римскими")
 	}
 }
 
@@ -87,11 +87,11 @@ func performOperation(a, b int, operator string) (int, error) {
 		return a * b, nil
 	case "/":
 		if b == 0 {
-			return 0, errors.New("деление на ноль")
+			return 0, fmt.Errorf("деление на ноль")
 		}
 		return a / b, nil
 	default:
-		return 0, errors.New("некорректная операция")
+		return 0, fmt.Errorf("некорректная операция")
 	}
 }
 
